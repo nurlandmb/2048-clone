@@ -62,4 +62,13 @@
   left: calc(10px + var(--x) * 98px);
   border-radius: 8px;
   background-color: var(--tile-2);
+  animation: tileShow 200ms ease-in-out;
+  transition: 100ms ease-in-out;
+}
+
+@keyframes tileShow{
+  0%{
+    opacity: .5;
+    transform: scale(0);
+  }
 }
