@@ -1,0 +1,65 @@
+:root{
+  --bg-board: rgb(187, 173, 160);
+  --bg-cell: rgb(204, 192, 179);
+  --tile-2: rgb(238, 228, 218);
+  --tile-4: rgb(237, 224, 200);
+  --tile-8: rgb(245, 149, 99);
+  --tile-16: rgb(245, 149, 110);
+  --tile-32: rgb(246, 124, 95);
+  --tile-64: rgb(246, 94, 59);
+  --tile-128: rgb(237, 107, 114);
+  --tile-256: rgb(237, 204, 97);
+  --tile-512: rgb(243, 201, 62);
+  --tile-1024: rgb(244, 195, 33);
+  --tile-2048: rgb(255, 196, 0);
+  --tile-lg-ligtness: 70%;
+  --tile-lg: hsl(290, 80%, var(--tile-lg-ligtness));
+}
+*,
+*::before,
+*::after{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+.game{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.title{
+  margin-bottom: 20px;
+}
+.board{
+  margin: 0 auto;
+  width: 400px;
+  height: 400px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+  gap: 10px;
+  padding: 10px;
+  background-color: var(--bg-board);
+  border-radius: 8px;
+  position: relative;
+}
+.cell{
+  background-color: var(--bg-cell);
+  border-radius: 8px;
+}
+.tile{
+  --x: 0;
+  --y: 2;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  height: 87.5px;
+  width: 87.5px;
+  top: calc(10px + var(--y) * 98px);
+  left: calc(10px + var(--x) * 98px);
+  border-radius: 8px;
+  background-color: var(--tile-2);
+}
