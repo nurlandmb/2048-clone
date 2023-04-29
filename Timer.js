@@ -18,6 +18,7 @@ class Timer {
   }
   stop() {
     clearInterval(this.interval);
+    this.interval = null;
   }
   set seconds(val) {
     this.secondsVal = val;
