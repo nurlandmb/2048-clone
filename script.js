@@ -1,122 +1,121 @@
 import Grid from './Grid.js';
 import Tile from './Tile.js';
-// document.addEventListener('DOMContentLoaded', () => {
-const board = document.querySelector('.board');
-const grid = new Grid(board);
-grid.randomEmptyCell().tile = new Tile(board);
-grid.randomEmptyCell().tile = new Tile(board);
-setupInput();
-// });
+class Game {
+  constructor(board) {
+    const scoreElem = document.querySelector('.score');
+    scoreElem.textContent = "";
+    this.scoreElem = scoreElem;
 
-function setupInput(e) {
-  window.addEventListener('keydown', handleInput, { once: true });
-}
-async function handleInput(e) {
-  switch (e.key) {
-    case 'ArrowUp':
-      if (!canMoveUp()) {
-        setupInput();
-        return;
-      }
-      await moveUp();
-      break;
-    case 'ArrowDown':
-      if (!canMoveDown()) {
-        setupInput();
-        return;
-      }
-      await moveDown();
-      break;
-    case 'ArrowLeft':
-      if (!canMoveLeft()) {
-        setupInput();
-        return;
-      }
-      await moveLeft();
-      break;
-    case 'ArrowRight':
-      if (!canMoveRight()) {
-        setupInput();
-        return;
-      }
-      await moveRight();
-      break;
-    default:
-      setupInput();
-      return;
+    this.board = board;
+    this.grid = new Grid(board);
   }
-  grid.cells.forEach((cell) => cell.mergeTiles());
-
-  const newTile = new Tile(board);
-  grid.randomEmptyCell().tile = newTile;
-  if (!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
-    newTile.waitForTransition(true).then(() => {
-      alert('You lose');
+  setupInput() {
+    window.addEventListener('keydown', this.handleInput.bind(this), {
+      once: true,
     });
-  } else {
-    setupInput();
   }
-}
-function moveUp() {
-  return slideTiles(grid.cellsByColumn);
-}
-function moveDown() {
-  return slideTiles(grid.cellsByColumn.map((column) => [...column].reverse()));
-}
-function moveLeft() {
-  return slideTiles(grid.cellsByRow);
-}
-function moveRight() {
-  return slideTiles(grid.cellsByRow.map((column) => [...column].reverse()));
-}
 
-function slideTiles(cells) {
-  return Promise.all(
-    cells.flatMap((group) => {
-      const promises = [];
-      for (let i = 1; i < group.length; i++) {
-        const cell = group[i];
-        if (cell.tile == null) continue;
-        let lastValidCell;
-        for (let j = i - 1; j >= 0; j--) {
-          const moveToCell = group[j];
-          if (!moveToCell.canAccept(cell.tile)) break;
-          lastValidCell = moveToCell;
-        }
-        if (lastValidCell != null) {
-          promises.push(cell.tile.waitForTransition());
-          if (lastValidCell.tile != null) {
-            lastValidCell.mergeTile = cell.tile;
-          } else {
-            lastValidCell.tile = cell.tile;
+  get score() {
+    return +this.scoreElem.textContent;
+  }
+  set score(val) {
+    this.scoreElem.textContent = val;
+  }
+  getOrderedCells(type) {
+    switch (type) {
+      case 'up':
+        return this.grid.cellsByColumn;
+      case 'down':
+        return this.grid.cellsByColumn.map((column) => [...column].reverse());
+      case 'right':
+        return this.grid.cellsByRow.map((column) => [...column].reverse());
+      case 'left':
+        return this.grid.cellsByRow;
+    }
+  }
+  slideTiles(type) {
+    let cells = this.getOrderedCells(type);
+    return Promise.all(
+      cells.flatMap((group) => {
+        const promises = [];
+        for (let i = 1; i < group.length; i++) {
+          const cell = group[i];
+          if (cell.tile == null) continue;
+          let lastValidCell;
+          for (let j = i - 1; j >= 0; j--) {
+            const moveToCell = group[j];
+            if (!moveToCell.canAccept(cell.tile)) break;
+            lastValidCell = moveToCell;
           }
-          cell.tile = null;
+          if (lastValidCell != null) {
+            promises.push(cell.tile.waitForTransition());
+            if (lastValidCell.tile != null) {
+              lastValidCell.mergeTile = cell.tile;
+            } else {
+              lastValidCell.tile = cell.tile;
+            }
+            cell.tile = null;
+          }
         }
-      }
-      return promises;
-    })
-  );
-}
-function canMoveUp() {
-  console.log(canMove(grid.cellsByColumn));
-  return canMove(grid.cellsByColumn);
-}
-function canMoveDown() {
-  return canMove(grid.cellsByColumn.map((cells) => [...cells].reverse()));
-}
-function canMoveRight() {
-  return canMove(grid.cellsByRow.map((cells) => [...cells].reverse()));
-}
-function canMoveLeft() {
-  return canMove(grid.cellsByRow);
-}
-function canMove(cells) {
-  return cells.some((group) => {
-    return group.some((cell, index) => {
-      if (index == 0) return false;
-      if (cell.tile == null) return false;
-      const moveToCell = group[index - 1];
-      return moveToCell.canAccept(cell.tile);
+        return promises;
+      })
+    );
+  }
+  canMove(type) {
+    const cells = this.getOrderedCells(type);
+    return cells.some((group) => {
+      return group.some((cell, index) => {
+        if (index == 0) return false;
+        if (cell.tile == null) return false;
+        const moveToCell = group[index - 1];
+        return moveToCell.canAccept(cell.tile);
+      });
     });
-  });
+  }
+  async handleInput(e) {
+    const cases = ['up', 'down', 'right', 'left'];
+    const moveType = e.key.slice(5).toLowerCase();
+    if (cases.includes(moveType)) {
+      if (!this.canMove(moveType)) {
+        this.setupInput();
+        return;
+      }
+      await this.slideTiles(moveType);
+    } else {
+      this.setupInput();
+      return;
+    }
+    this.grid.cells.forEach((cell) => {
+      const val = cell.mergeTiles();
+      if (val > 0) {
+        this.score = this.score + val;
+      }
+    });
+    const newTile = new Tile(this.board);
+    this.grid.randomEmptyCell().tile = newTile;
+    if (
+      !this.canMove('up') &&
+      !this.canMove('down') &&
+      !this.canMove('right') &&
+      !this.canMove('left')
+    ) {
+      newTile.waitForTransition(true).then(() => {
+        alert('You lose');
+      });
+    } else {
+      this.setupInput();
+    }
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+  const restart = document.querySelector('.restart');
+  restart.addEventListener('click', () => init());
+});
+function init() {
+  const board = document.querySelector('.board');
+  const game = new Game(board);
+  game.grid.randomEmptyCell().tile = new Tile(game.board);
+  game.grid.randomEmptyCell().tile = new Tile(game.board);
+  game.setupInput();
 }

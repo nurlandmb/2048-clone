@@ -1,9 +1,12 @@
 class Grid {
   constructor(gridElement) {
+
+    gridElement.textContent = "";
     this.cells = this.createCellElements(gridElement).map((cell, i) => {
       return new Cell(cell, i % 4, Math.floor(i / 4));
     });
   }
+  
   get emptyCells() {
     return this.cells.filter((cell) => cell.tile == null);
   }
@@ -75,6 +78,7 @@ class Cell {
     this.tile.value = this.tile.value * 2;
     this.mergeTile.remove();
     this.#mergeTile = null;
+    return this.tile.value;
   }
 }
 export default Grid;
