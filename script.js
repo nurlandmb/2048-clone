@@ -1,13 +1,19 @@
 import Grid from './Grid.js';
 import Tile from './Tile.js';
+import Timer from './Timer.js';
 class Game {
-  constructor(board) {
+  autoplayInterval;
+  level;
+  constructor(board, level) {
     const scoreElem = document.querySelector('.score');
-    scoreElem.textContent = "";
+    scoreElem.textContent = '';
     this.scoreElem = scoreElem;
-
     this.board = board;
     this.grid = new Grid(board);
+    this.timer = Timer;
+    this.timer.start();
+    this.level = level;
+    this.record = localStorage.getItem('record') || 0;
   }
   setupInput() {
     window.addEventListener('keydown', this.handleInput.bind(this), {
@@ -20,6 +26,22 @@ class Game {
   }
   set score(val) {
     this.scoreElem.textContent = val;
+  }
+  turnAutoplay() {
+    const keys = ['Up', 'Down', 'Right', 'Left'];
+    if (this.autoplayInterval) return;
+    this.autoplayInterval = setInterval(() => {
+      for (let i = 0; i < keys.length; i++) {
+        if (this.canMove(keys[i].toLowerCase())) {
+          this.handleInput({ key: 'Arrow' + keys[i] });
+          break;
+        }
+      }
+    }, 1000);
+  }
+  turnOffAutoplay() {
+    clearInterval(this.autoplayInterval);
+    this.autoplayInterval = null;
   }
   getOrderedCells(type) {
     switch (type) {
@@ -91,8 +113,10 @@ class Game {
         this.score = this.score + val;
       }
     });
-    const newTile = new Tile(this.board);
+    const newTile = new Tile(this.board, this.level);
     this.grid.randomEmptyCell().tile = newTile;
+    this.isLosed();
+    // Move to isLosed
     if (
       !this.canMove('up') &&
       !this.canMove('down') &&
@@ -100,22 +124,49 @@ class Game {
       !this.canMove('left')
     ) {
       newTile.waitForTransition(true).then(() => {
-        alert('You lose');
+        if(this.score > this.record){
+          localStorage.setItem('record', this.score);
+          alert("You beat the record");
+        }else{
+          alert('You lose');
+
+        }
+        this.timer.stop();
       });
     } else {
       this.setupInput();
     }
   }
+  isLosed() {}
 }
 document.addEventListener('DOMContentLoaded', () => {
-  init();
+  let game = init();
   const restart = document.querySelector('.restart');
-  restart.addEventListener('click', () => init());
+  const levelBtns = document.querySelectorAll('.level');
+  const botBtn = document.querySelector('.bot');
+  botBtn.addEventListener('click', (e) => {
+    if(e.target.textContent === 'Turn on bot'){
+      game.turnAutoplay();
+      e.target.textContent = 'Turn off bot';
+    }else{
+      game.turnOffAutoplay();
+      e.target.textContent = "Turn on bot";
+    }
+  })
+  console.log(levelBtns);
+  levelBtns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const level = e.target.dataset.level;
+      game.level = level;
+    });
+  });
+  restart.addEventListener('click', () => game = init());
 });
 function init() {
   const board = document.querySelector('.board');
-  const game = new Game(board);
-  game.grid.randomEmptyCell().tile = new Tile(game.board);
-  game.grid.randomEmptyCell().tile = new Tile(game.board);
+  const game = new Game(board, 1);
+  game.grid.randomEmptyCell().tile = new Tile(game.board, 1);
+  game.grid.randomEmptyCell().tile = new Tile(game.board, 1);
   game.setupInput();
+  return game;
 }
