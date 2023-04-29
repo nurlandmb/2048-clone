@@ -23,7 +23,7 @@ class Timer {
     this.secondsVal = val;
     const hours = this.addZero(this.hours);
     const minutes = this.addZero(this.minutes);
-    const leftSeconds = this.addZero(this.seconds);
+    const leftSeconds = this.addZero(this.leftSeconds);
     this.timer.textContent = `${hours}:${minutes}:${leftSeconds}`;
   }
   addZero(time){

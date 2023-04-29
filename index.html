@@ -9,17 +9,41 @@
   </head>
   <body>
     <section class="game">
-      <h2 class="title">2048</h2>
-      <div class="board">
+      <div class="container">
+        <h2 class="title">2048</h2>
+        <div class="wrapper">
+          <p>Score: <span class="score">0</span></p>
+          <p class="timer">00:00:00</p>
+        </div>
+        <div class="board"></div>
+        <div class="wrapper">
+          <button class="bot">Auto</button>
+          <button class="restart">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              width="24px"
+              height="24px"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="levels">
+          <button data-level="1" class="level active">Easy</button>
+          <button data-level=".4" class="level">Medium</button>
+          <button data-level=".2" class="level">High</button>
+        </div>
+        <p class="record"></p>
       </div>
     </section>
-    <div class="score">0</div>
-    <button class="restart">Restart</button>
-    <p class="timer">00:00:00</p>
-    <button data-level="1" class="level active">Easy</button>
-    <button data-level=".4" class="level">Medium</button>
-    <button data-level=".2" class="level">High</button>
-    <button class="bot">Turn on bot</button>
     <script type="module" src="./script.js"></script>
   </body>
 </html>

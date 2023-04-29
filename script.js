@@ -116,7 +116,6 @@ class Game {
     const newTile = new Tile(this.board, this.level);
     this.grid.randomEmptyCell().tile = newTile;
     this.isLosed();
-    // Move to isLosed
     if (
       !this.canMove('up') &&
       !this.canMove('down') &&
@@ -124,12 +123,13 @@ class Game {
       !this.canMove('left')
     ) {
       newTile.waitForTransition(true).then(() => {
-        if(this.score > this.record){
+        if (this.score > this.record) {
           localStorage.setItem('record', this.score);
-          alert("You beat the record");
-        }else{
+          const recordElem = document.querySelector('.record');
+          recordElem.textContent = `High score: ${this.score}`;
+          alert('You beat the record');
+        } else {
           alert('You lose');
-
         }
         this.timer.stop();
       });
@@ -144,23 +144,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const restart = document.querySelector('.restart');
   const levelBtns = document.querySelectorAll('.level');
   const botBtn = document.querySelector('.bot');
+  const recordElem = document.querySelector('.record');
+  const recordVal = localStorage.getItem('record') || 0;
+  if(recordVal){
+    recordElem.textContent = `High score: ${recordVal}`;
+  }
   botBtn.addEventListener('click', (e) => {
-    if(e.target.textContent === 'Turn on bot'){
+    if (!e.target.classList.contains('active')) {
       game.turnAutoplay();
-      e.target.textContent = 'Turn off bot';
-    }else{
+      e.target.classList.add('active');
+    } else {
       game.turnOffAutoplay();
-      e.target.textContent = "Turn on bot";
+      e.target.classList.remove('active');
     }
-  })
-  console.log(levelBtns);
+  });
   levelBtns.forEach((btn) => {
     btn.addEventListener('click', (e) => {
+      levelBtns.forEach(btn => btn.classList.remove('active'));
+      e.target.classList.add("active");
       const level = e.target.dataset.level;
       game.level = level;
     });
   });
-  restart.addEventListener('click', () => game = init());
+  restart.addEventListener('click', () => (game = init()));
 });
 function init() {
   const board = document.querySelector('.board');

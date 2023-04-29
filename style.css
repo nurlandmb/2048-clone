@@ -1,4 +1,4 @@
-:root{
+:root {
   --bg-board: rgb(187, 173, 160);
   --bg-cell: rgb(204, 192, 179);
   --tile-2: rgb(238, 228, 218);
@@ -17,22 +17,30 @@
 }
 *,
 *::before,
-*::after{
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
-.game{
+body {
+  font-size: 22px;
+  font-family: 'Arial', sans-serif;
+  background: #f6f1f1;
+}
+.game {
+  width: 400px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-height: 100vh;
 }
-.title{
+.title {
   margin-bottom: 20px;
 }
-.board{
-  margin: 0 auto;
+.board {
+  margin: 10px auto;
   width: 400px;
   height: 400px;
   display: grid;
@@ -44,11 +52,11 @@
   border-radius: 8px;
   position: relative;
 }
-.cell{
+.cell {
   background-color: var(--bg-cell);
   border-radius: 8px;
 }
-.tile{
+.tile {
   --x: 0;
   --y: 2;
   position: absolute;
@@ -65,10 +73,52 @@
   animation: tileShow 200ms ease-in-out;
   transition: 100ms ease-in-out;
 }
-
-@keyframes tileShow{
-  0%{
-    opacity: .5;
+.wrapper {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: inherit;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+button:hover {
+  opacity: 0.7;
+}
+.levels {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.level,
+.bot {
+  border-radius: 8px;
+  background: #394867;
+  color: #f6f1f1;
+  padding: 10px 20px;
+}
+.level.active,
+.bot.active {
+  background: #212a3e;
+  color: #f1f6f9;
+}
+.record {
+  text-align: center;
+  margin-top: 20px;
+  font-weight: 700;
+}
+@keyframes tileShow {
+  0% {
+    opacity: 0.5;
     transform: scale(0);
   }
 }
